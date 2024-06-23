@@ -6,7 +6,6 @@ on:
 
 permissions:
   id-token: write
-  packages: write
   contents: read
 
 env:
@@ -40,6 +39,9 @@ jobs:
 
   Build-Docker-Image:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
     needs: build
     name: Build image and store in GitHub Container Registry
     steps:
