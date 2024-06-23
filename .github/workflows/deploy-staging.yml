@@ -4,10 +4,6 @@ on:
   pull_request:
     types: [labeled]
 
-permissions:
-  id-token: write
-  contents: read
-
 env:
   IMAGE_REGISTRY_URL: ghcr.io
   ################################################
@@ -79,21 +75,22 @@ jobs:
 
   Deploy-to-Azure:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     needs: Build-Docker-Image
     name: Deploy app container to Azure
     steps:
       - name: "Login via Azure CLI"
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - uses: azure/docker-login@v1
         with:
           login-server: ${{env.IMAGE_REGISTRY_URL}}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.CR_PAT }}
 
       - name: Deploy web app container
         uses: azure/webapps-deploy@v3
